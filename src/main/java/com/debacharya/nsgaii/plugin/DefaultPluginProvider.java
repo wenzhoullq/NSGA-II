@@ -26,10 +26,16 @@ package com.debacharya.nsgaii.plugin;
 
 import com.debacharya.nsgaii.Service;
 import com.debacharya.nsgaii.datastructure.Chromosome;
+import com.debacharya.nsgaii.datastructure.CityAllele;
 import com.debacharya.nsgaii.datastructure.Population;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static com.debacharya.nsgaii.termination.PreProcessLoadData.clusters;
+import static com.debacharya.nsgaii.termination.PreProcessLoadData.historyRecord;
 
 public class DefaultPluginProvider {
 
