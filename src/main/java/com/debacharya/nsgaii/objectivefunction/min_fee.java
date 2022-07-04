@@ -14,9 +14,9 @@ public class min_fee extends AbstractObjectiveFunction  {
     @Override
     public double getValue(Chromosome chromosome) {
         List<AbstractAllele> gene=chromosome.getGeneticCode();
-        CityAllele hinge_cityAllele=(CityAllele)gene.get(0),no_hinge_cityAllele=(CityAllele) gene.get(1);
-        String[] center=hinge_cityAllele.getGene(),no_center=no_hinge_cityAllele.getGene();
-        String hinge_city=center[0],hinge_city_code=center[1],no_hinge_city=no_center[0],no_hinge_code=no_center[1];
+        CityAllele hinge_cityAllele=(CityAllele)gene.get(0);
+        String[] codes=hinge_cityAllele.getGene();
+        String hinge_city_code=codes[0],no_hinge_city_code=codes[1];
         int[][] distance=(int[][]) city_distance.clone();
         int hinge_city_length=hinge_city.length();
         HashMap<Integer,Boolean> m=new HashMap<>();
