@@ -37,4 +37,14 @@ public class loadData {
     public static  HashMap<Character,Integer> hinge_map=new HashMap<>();
     //非中枢机场的名称和下标的映射
     public static  HashMap<Character,Integer> no_hinge_map=new HashMap<>();
+    //飞机A单位飞机每公里的费用,用于支线—>中枢或者中枢——>支线
+    public static int fee1;
+    //飞机B单位飞机每公里的费用,用于中枢—>中枢
+    public static int fee2;
+    //飞机A单位飞机的容量,用于支线—>中枢或者中枢——>支线
+    public static int airplane1;
+    //飞机B单位飞机的容量,用于中枢——>中枢
+    public static int airplane2;
+    //折扣系数，用于中枢机场和中枢机场之间成本的打折
+    public static double discount;
 }
