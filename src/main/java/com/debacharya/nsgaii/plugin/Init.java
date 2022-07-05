@@ -7,8 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Init implements PopulationProducer{
-    public static String hinge_city;
-    public static String no_hinge_city;
+
     @Override
     public Population produce(int populationSize, int chromosomeLength, GeneticCodeProducer geneticCodeProducer, FitnessCalculator fitnessCalculator) {
         List<Chromosome> populace = new ArrayList();

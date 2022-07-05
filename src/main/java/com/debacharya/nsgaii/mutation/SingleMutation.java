@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static com.debacharya.nsgaii.loadData.hinge_city;
 import static com.debacharya.nsgaii.loadData.hinge_citynum;
 import static com.debacharya.nsgaii.loadData.no_hinge_citynum;
-import static com.debacharya.nsgaii.plugin.Init.hinge_city;
 
 public class SingleMutation extends AbstractMutation{
     @Override
