@@ -1,5 +1,7 @@
 package com.debacharya.nsgaii.termination;
 
+import static com.debacharya.nsgaii.loadData.historyRecord;
+
 public class TerminatingCriterionProvider {
 
 	/*
@@ -8,5 +10,10 @@ public class TerminatingCriterionProvider {
 	 */
 	public static TerminatingCriterion fixedTerminatingCriterion() {
 		return (population, generationCount, maxGenerations) -> (generationCount <= maxGenerations);
+	}
+	public static TerminatingCriterion refactorTerminatingCriterion(int maxPopulationSize, int maxRecordSize) {
+		return ((parentPopulation, generationCount, maxGenerations) -> {
+			return generationCount <= maxGenerations && historyRecord.size() <= maxRecordSize;
+		});
 	}
 }

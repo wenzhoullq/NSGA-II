@@ -16,8 +16,9 @@ import static com.debacharya.nsgaii.loadData.*;
 
 
 public class FatherCrossover extends AbstractCrossover{
-    public FatherCrossover(CrossoverParticipantCreator crossoverParticipantCreator) {
+    public FatherCrossover(CrossoverParticipantCreator crossoverParticipantCreator,float crossoverProbability) {
         super(crossoverParticipantCreator);
+        this.crossoverProbability = crossoverProbability;
     }
     private void Crossover(List<Chromosome> children, Chromosome p1, Chromosome p2){
         //取出p1,p2染色体的等位基因
@@ -51,12 +52,12 @@ public class FatherCrossover extends AbstractCrossover{
         Chromosome c1=new Chromosome(geneticCodes1),
                    c2=new Chromosome(geneticCodes2);
         //
-        if (!historyRecord.containsKey(c1)) {
-            historyRecord.put(c1, true);
+        if (!historyRecord.containsKey(hinge_city_code1+son_no_hinge_city_code1)) {
+            historyRecord.put(hinge_city_code1+son_no_hinge_city_code1, true);
             children.add(c1);
         }
-        if (!historyRecord.containsKey(c2)) {
-            historyRecord.put(c2, true);
+        if (!historyRecord.containsKey(hinge_city_code2+son_no_hinge_city_code2)) {
+            historyRecord.put(hinge_city_code2+son_no_hinge_city_code2, true);
             children.add(c2);
         }
     }

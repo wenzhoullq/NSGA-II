@@ -5,6 +5,18 @@ import com.debacharya.nsgaii.datastructure.Chromosome;
 import java.util.HashMap;
 
 public class loadData {
+    //最大个体数目
+    public static int MaxRecord ;
+    //种群的最大的代数
+    public static int MaxGeneration;
+    //最大种群数
+    public  static  int MaxPopulationSize;
+    //变异的概率
+    public static float mutationProb;
+    //交叉的概率
+    public static float crossoverProb;
+    //种群初始化的数量
+    public static int start_num;
     //城市之间的距离
     public static int[][] city_distance;
     //城市之间的运输量
@@ -21,10 +33,8 @@ public class loadData {
     public static int hinge_citynum;
     //非枢纽城市的数量（第二条等位基因的长度）
     public static int no_hinge_citynum;
-    //单架飞机的最大运力
-    public static  int max_transport;
     //已产生的基因型记录
-    public static HashMap<Chromosome, Boolean> historyRecord;
+    public static HashMap<String, Boolean> historyRecord;//String是:枢纽城市code+非枢纽城市code
     //交叉时选择基因的概率
     public static  double p=0.5;
     //选择为待用中枢机场概率表
@@ -47,4 +57,12 @@ public class loadData {
     public static int airplane2;
     //折扣系数，用于中枢机场和中枢机场之间成本的打折
     public static double discount;
+    //飞机A单位飞机每公里的费用,用于支线—>中枢或者中枢——>支线
+    public static int co2_1;
+    //飞机B单位飞机每公里的费用,用于中枢—>中枢
+    public static int co2_2;
+    //飞机A起飞降落的油耗
+    public static int up_down1;
+    //飞机B起飞降落的油耗
+    public static int up_down2;
 }

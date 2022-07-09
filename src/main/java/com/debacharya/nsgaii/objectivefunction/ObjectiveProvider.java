@@ -42,6 +42,13 @@ public class ObjectiveProvider {
 			)
 		);
 	}
+	//添加目标函数
+	public static List<AbstractObjectiveFunction> provideMin_co2AndMin_fee() {
+		return new ArrayList<AbstractObjectiveFunction>() {{
+			add(new min_fee());
+			add(new min_co2());
+		}};
+	}
 
 	public static List<AbstractObjectiveFunction> provideSCHObjectives(FitnessCalculator fitnessCalculator) {
 

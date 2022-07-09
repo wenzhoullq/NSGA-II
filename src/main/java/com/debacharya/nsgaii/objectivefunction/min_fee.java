@@ -18,7 +18,6 @@ public class min_fee extends AbstractObjectiveFunction  {
         CityAllele hinge_cityAllele=(CityAllele)gene.get(0);
         String[] codes=hinge_cityAllele.getGene();
         String hinge_city_code=codes[0],no_hinge_city_code=codes[1];
-        int hinge_city_length=hinge_city.length();
         HashMap<Integer,Boolean> m=new HashMap<>();
         //建立hashMap用于判断是否为枢纽城市
         for(int i=0;i<hinge_city.length();i++){

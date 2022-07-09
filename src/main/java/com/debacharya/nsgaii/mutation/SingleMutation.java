@@ -13,6 +13,9 @@ import static com.debacharya.nsgaii.loadData.hinge_citynum;
 import static com.debacharya.nsgaii.loadData.no_hinge_citynum;
 
 public class SingleMutation extends AbstractMutation{
+    public SingleMutation(float mutationProbability){
+        super(mutationProbability);
+    }
     @Override
     public Chromosome perform(Chromosome chromosome) {
         //取出染色体的等位基因

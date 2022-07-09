@@ -24,12 +24,15 @@
 
 package com.debacharya.nsgaii.plugin;
 import com.debacharya.nsgaii.Service;
+import com.debacharya.nsgaii.datastructure.AbstractAllele;
 import com.debacharya.nsgaii.datastructure.Chromosome;
+import com.debacharya.nsgaii.datastructure.CityAllele;
 import com.debacharya.nsgaii.datastructure.Population;
 import com.debacharya.nsgaii.loadData;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.debacharya.nsgaii.loadData.*;
 
@@ -171,6 +174,23 @@ public class DefaultPluginProvider {
 		}
 		return new String(no_hinge_city_code);
 	}
+	public static PopulationProducer fileInitPopulationProducer() {
+		// 接口里的参数是没用到的
+		return (populationSize, chromosomeLength, geneticCodeProducer, fitnessCalculator) -> {
+			// 初始个体
+			List<CityAllele> cityAlleles = new ArrayList<>(start_num);
+			for (int i = 0; i < start_num; i++) {
+				String hinge_code=Create_hinge_city_code();
+				String no_hinge_code=Create_no_hinge_city_code(hinge_code);
+				historyRecord.put(hinge_code+no_hinge_code, true);//
+				cityAlleles.add(new CityAllele(hinge_code,no_hinge_code));
+			}
+			Chromosome initIndividual = new Chromosome(new Chromosome(cityAlleles));
+
+			List<Chromosome> populace = new ArrayList<Chromosome>() {{ add(initIndividual); }};
+			return new Population(populace);
+		};
+	}
 	public static PopulationProducer defaultPopulationProducer() {
 		return (populationSize, chromosomeLength, geneticCodeProducer, fitnessCalculator) -> {
 
@@ -186,7 +206,39 @@ public class DefaultPluginProvider {
 			return new Population(populace);
 		};
 	}
+		//产生子代的方法
+	public static ChildPopulationProducer childrenProducer(float mutationProb) {
+		return (parentPopulation, crossover, mutation, populationSize) -> {
+			List<Chromosome> populace;
+			// 交叉产生的新后代
+			populace = crossover.perform(parentPopulation);
 
+			// 变异产生的新后代
+			int mutateNum = (int) (parentPopulation.getPopulace().size() * mutationProb);
+			mutateNum = Math.max(mutateNum, 1);
+			HashSet<Integer> mutateParents = new HashSet<>();
+			for (int i = 0; i < mutateNum; i++) {
+				int id;
+				do {
+					id = ThreadLocalRandom.current().nextInt(0, parentPopulation.getPopulace().size());
+				}  while (mutateParents.contains(id));
+				mutateParents.add(id);
+			}
+
+			for (int id : mutateParents) {
+				Chromosome child = mutation.perform(parentPopulation.get(id));
+				List<AbstractAllele> genelist=child.getGeneticCode();
+				CityAllele cityAllele=(CityAllele)genelist.get(0);
+				String[] codes=cityAllele.getGene();
+				if (!historyRecord.containsKey(child)) {
+					historyRecord.put(codes[0]+codes[1],true);
+					populace.add(child);
+				}
+			}
+
+			return new Population(populace);
+		};
+	}
 	public static ChildPopulationProducer defaultChildPopulationProducer() {
 		return (parentPopulation, crossover, mutation, populationSize) -> {
 
