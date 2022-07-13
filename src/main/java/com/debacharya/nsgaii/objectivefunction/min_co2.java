@@ -25,10 +25,10 @@ public class min_co2 extends AbstractObjectiveFunction{
             for(int j=0;j<citynum;j++){
                 if(i==j) continue;
                 if(!m.get(i)){//如果i不是枢纽节点
-                    int no_hign_index1=no_hinge_map.get((char)(i+'0'));
+                    int no_hign_index1=no_hinge_map2.get(i);
                     int target1=no_hinge_city_code.charAt(no_hign_index1)-'0';
                     if(!m.get(j)){//如果j不是枢纽节点
-                        int no_bign_index2=no_hinge_map.get((char)(j+'0'));
+                        int no_bign_index2=no_hinge_map2.get(j);
                         int target2=no_hinge_city_code.charAt(no_bign_index2)-'0';
                         ans+=(city_transport[i][j]/airplane1+city_transport[i][j]%airplane1)*
                                 (city_distance[i][target1]+city_distance[target2][j])*co2_1+up_down1*2;
@@ -46,7 +46,7 @@ public class min_co2 extends AbstractObjectiveFunction{
                     }
                 }
                 else {//如果i是枢纽节点
-                    int hign_index1=hinge_map.get((char)(i+'0'));
+                    int hign_index1=hinge_map2.get(i+'0');
                     int target1=hinge_city_code.charAt(hign_index1)-'0';
                     if(!m.get(j)){//如果j不是枢纽节点
                         ans+=(city_transport[i][j]/airplane1+city_transport[i][j]%airplane1)*

@@ -38,69 +38,88 @@ import static com.debacharya.nsgaii.loadData.*;
 
 
 public class DefaultPluginProvider {
-	//
 
 	public static void Create_city(){
-		int[][] transport=(int[][])city_transport.clone();
-		int[][] distance=(int[][])city_distance.clone();
-		int[] city_all_transport=new int[citynum];
+		float[] city_all_transport=new float[citynum];
 		int[] city_all_distance=new int[citynum];
 		//统计城市i的出入流量,与其他城市距离的总和
 		for(int i=0;i<citynum;i++){
 			for(int j=0;j<citynum;j++){
-				city_all_transport[i]+=transport[i][j]+transport[j][i];
-				city_all_distance[i]+=distance[i][j];
+				city_all_transport[i]+=city_transport[i][j];
+				city_all_distance[i]+=city_distance[i][j];
 			}
+//                System.out.println(city_all_transport[i]+" "+city_all_distance[i]);
 		}
-		int sum_transport=0;
-		int sum_distance=0;
+		float sum_transport=0;
+		float sum_distance=0;
 		//统计总流量
-		for(int temp:city_all_transport) sum_transport+=temp;
+		for(float temp:city_all_transport) sum_transport+=temp;
+//            System.out.println(sum_transport);
 		//统计总距离
 		for(int temp:city_all_distance) sum_distance+=temp;
+//            System.out.println(sum_distance);
 		//备选枢纽i的旅客需求量占网络总旅客需求量的比例zx
-		double[] zx=new double[citynum];
-		for(int i=0;i<citynum;i++) zx[i]=city_all_transport[i]/sum_transport;
+		float[] zx=new float[citynum];
+		for(int i=0;i<citynum;i++) {
+			zx[i]=city_all_transport[i]/sum_transport;
+//                System.out.println(zx[i]+" "+i);
+		}
 		//备选枢纽i的旅客需求量占网络总距离的比例zx
-		double[] zd=new double[citynum];
+		float[] zd=new float[citynum];
 		//计算流量/距离 zx_zd
 		for(int i=0;i<citynum;i++){
 			zd[i]=city_all_distance[i]/sum_distance;
 			zx_zd[i]=zx[i]/zd[i];
+//                System.out.println(zd[i]);
+//                System.out.println(zx_zd[i]);
 		}
 		//选取hinge_citynum个中枢城市作为备选基因表
-		Queue<Integer> q=new PriorityQueue<>((a,b)->new BigDecimal(zx_zd[b]).compareTo(new BigDecimal(zx_zd[a])));
+		Queue<Integer> q=new PriorityQueue<>((a, b)->Float.compare(zx_zd[b],zx_zd[a]));
 		for(int i=0;i<citynum;i++) q.add(i);
-		char[] hinge_city=new char[hinge_citynum];
-		boolean[] visit=new boolean[hinge_citynum];
+		String str=new String();
+		boolean[] visit=new boolean[citynum];
+		String[] hinge_city=new String[hinge_citynum];
 		for(int i=0;i<hinge_citynum;i++) {
 			int temp=q.poll();
-			hinge_map.put((char)(temp+'0'),i);
-			hinge_city[i]=(char)(temp+'0');
+			hinge_map1.put(i,temp);
+			hinge_map2.put(temp,i);
+			str+=temp+"_";
+			hinge_city[i]=String.valueOf(temp);
 			visit[temp]=true;
+			//System.out.println(temp);
 		}
-		loadData.hinge_city=new String(hinge_city);
+		loadData.hinge_city=new String(str.substring(0,str.length()-1));
+//            System.out.println(loadData.hinge_city);
 		//对中枢机场的选择概率进行归一化处理
-		double sum=0;
+		float sum=0;
 		for(int i=0;i<hinge_citynum;i++){
-			sum+=hinge_city_zx_zd_choose[hinge_city[i]-'0'];
+			//System.out.println(hinge_city[i]+" "+hinge_map.get(hinge_city[i]));
+			sum+=zx_zd[Integer.valueOf(hinge_city[i])];
 		}
 		for(int i=0;i<hinge_citynum;i++){
-			hinge_city_zx_zd_choose[hinge_city[i]-'0']=hinge_city_zx_zd_choose[hinge_city[i]-'0']/sum;
+			hinge_city_zx_zd_choose[i]=zx_zd[Integer.valueOf(hinge_city[i])]/sum;
+		}
+//            System.out.println(sum);
+		for(int i=0;i<hinge_citynum;i++){
+			int index=Integer.parseInt(hinge_city[i]);
+//			System.out.println(index);
+			zx_zd[hinge_map2.get(index)]=zx_zd[hinge_map2.get(index)]/sum;
+//                System.out.println(zx_zd[hinge_map.get(hinge_city[i])]);
 		}
 		// 对权重的zx_zd_quanzhong进行初始化
 		for(int i=1;i<=hinge_citynum;i++){
 			hinge_city_zx_zd_quanzhong[i]=hinge_city_zx_zd_quanzhong[i-1]+hinge_city_zx_zd_choose[i-1];
 		}
 		//初始化非中枢城市基因表
-		char[] no_hinge_city=new char[no_hinge_citynum];
 		int index=0;
+		str="";
 		for(int i=0;i<citynum;i++) {
 			if(visit[i]) continue;
-			no_hinge_map.put((char)(i+'0'),index);
-			no_hinge_city[index++]=(char)(i+'0');
+			no_hinge_map1.put(index++,i);
+			str+=String.valueOf(i)+"_";
 		}
-		loadData.no_hinge_city=new String(no_hinge_city);
+//            System.out.println(str);
+		loadData.no_hinge_city=new String(str.substring(0,str.length()-1));
 	}
 	public static  String Create_hinge_city_code(){
 		char[] hinge_city_code=new char[hinge_citynum];
@@ -110,8 +129,10 @@ public class DefaultPluginProvider {
 		for(int i=0;i<hinge_citynum;i++) {
 			int left=1,right=hinge_citynum;
 			double target=random.nextDouble();
+//			System.out.println(target);
 			while(left<right){
 				int mid=(left+right)/2;
+//				System.out.println(hinge_city_zx_zd_quanzhong[mid]);
 				if(hinge_city_zx_zd_quanzhong[mid]<target) left=mid+1;
 				else right=mid;
 			}
@@ -174,7 +195,7 @@ public class DefaultPluginProvider {
 		}
 		return new String(no_hinge_city_code);
 	}
-	public static PopulationProducer fileInitPopulationProducer() {
+	public static PopulationProducer InitPopulationProducer() {
 		// 接口里的参数是没用到的
 		return (populationSize, chromosomeLength, geneticCodeProducer, fitnessCalculator) -> {
 			// 初始个体

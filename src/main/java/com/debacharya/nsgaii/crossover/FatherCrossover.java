@@ -4,10 +4,9 @@ import com.debacharya.nsgaii.datastructure.AbstractAllele;
 import com.debacharya.nsgaii.datastructure.Chromosome;
 import com.debacharya.nsgaii.datastructure.CityAllele;
 import com.debacharya.nsgaii.datastructure.Population;
-import com.debacharya.nsgaii.plugin.Init;
+import com.debacharya.nsgaii.plugin.DefaultPluginProvider;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -29,21 +28,20 @@ public class FatherCrossover extends AbstractCrossover{
                  cityCodes2=cityAllele2.getGene();
         char[] hinge_city_code1=cityCodes1[0].toCharArray(),
                hinge_city_code2=cityCodes2[0].toCharArray();
-        //交叉染色体，对于枢纽城市，则将他们加入并集，并按照p=0.5的概率进行伯努利抽样,并且枢纽城市的数量保持n=hinge_citynum
-
+        //交叉染色体，对于枢纽城市，则将他们加入并集，并按照p=crossoverProb的概率进行伯努利抽样,并且枢纽城市的数量保持n=hinge_citynum
         Random random=new Random();
-        HashSet<Integer> hs=new HashSet<>();
         //交叉中枢城市编码,按伯努利分布进行抽样，满足设定概率值则两两交换
         for(int i=0;i<hinge_citynum;i++){
             double temp_p=random.nextDouble();
-            if(temp_p<=0.2) {
+            if(temp_p<=crossoverProb) {
                 char temp=hinge_city_code1[i];
                 hinge_city_code1[i]=hinge_city_code2[i];
                 hinge_city_code2[i]=temp;
             }
         }
         //生成非中枢城市路径之间的连接
-        String son_no_hinge_city_code1= Init.find_way(),son_no_hinge_city_code2=Init.find_way();
+        String son_no_hinge_city_code1= DefaultPluginProvider.Create_hinge_city_code(),
+                son_no_hinge_city_code2=DefaultPluginProvider.Create_hinge_city_code();
         List<CityAllele> geneticCodes1=new ArrayList<>(),geneticCodes2=new ArrayList<>();
         CityAllele gen1=new CityAllele(new String(hinge_city_code1),son_no_hinge_city_code1),
                     gen2=new CityAllele(new String(hinge_city_code2),son_no_hinge_city_code2);

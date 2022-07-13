@@ -29,10 +29,10 @@ public class min_fee extends AbstractObjectiveFunction  {
             for(int j=0;j<citynum;j++){
                 if(i==j) continue;
                 if(!m.get(i)){//如果i不是枢纽节点
-                    int no_hign_index1=no_hinge_map.get((char)(i+'0'));
+                    int no_hign_index1=no_hinge_map2.get(i+'0');
                     int target1=no_hinge_city_code.charAt(no_hign_index1)-'0';
                     if(!m.get(j)){//如果j不是枢纽节点
-                        int no_bign_index2=no_hinge_map.get((char)(j+'0'));
+                        int no_bign_index2=no_hinge_map2.get(j+'0');
                         int target2=no_hinge_city_code.charAt(no_bign_index2)-'0';
                         ans+=(city_transport[i][j]/airplane1+city_transport[i][j]%airplane1)*
                                 (city_distance[i][target1]+city_distance[target2][j])*fee1;
@@ -48,7 +48,7 @@ public class min_fee extends AbstractObjectiveFunction  {
                 }
                 else {//如果i是枢纽节点
                     if(!m.get(j)){//如果j不是枢纽节点
-                        int no_bign_index=no_hinge_map.get((char)(j+'0'));
+                        int no_bign_index=no_hinge_map2.get(j);
                         int target=no_hinge_city_code.charAt(no_bign_index)-'0';
                         ans+=(city_transport[i][j]/airplane1+city_transport[i][j]%airplane1)*
                                 (city_distance[j][target])*fee1;
