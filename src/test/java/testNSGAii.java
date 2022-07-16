@@ -4,6 +4,7 @@ import com.debacharya.nsgaii.crossover.FatherCrossover;
 import com.debacharya.nsgaii.mutation.SingleMutation;
 import com.debacharya.nsgaii.objectivefunction.ObjectiveProvider;
 import com.debacharya.nsgaii.plugin.DefaultPluginProvider;
+import com.debacharya.nsgaii.plugin.GeneticCodeProducerProvider;
 import com.debacharya.nsgaii.termination.TerminatingCriterionProvider;
 
 import java.text.DecimalFormat;
@@ -16,11 +17,11 @@ public class testNSGAii {
         return fourDF.format(data);
     }
     public static void main(String[] args) {
-        Configuration configuration = new Configuration();
+        init();
+        Configuration configuration = new Configuration(ObjectiveProvider.provideMin_co2AndMin_fee());
         long start = System.currentTimeMillis();
         // 初始化种群
         configuration.setPopulationProducer(DefaultPluginProvider.InitPopulationProducer());
-        configuration.objectives = ObjectiveProvider.provideMin_co2AndMin_fee();
         //交叉操作
         configuration.setChromosomeLength(citynum);//染色体的长度是城市的数量，是中枢城市+非中枢城市的长度
         configuration.setCrossover(new FatherCrossover(null, crossoverProb));
@@ -30,7 +31,7 @@ public class testNSGAii {
         configuration.setChildPopulationProducer(DefaultPluginProvider.childrenProducer(mutationProb));
         // 最大代数，与终止条件有关
         configuration.setGenerations(MaxGeneration);
-        // 原意是种群的固定数量，但在本研究中，种群数量是从1开始的，次值应该是种群上限
+        // 原意是种群的固定数量，但在本研究中，种群数量是从2开始的，次值应该是种群上限
         configuration.setPopulationSize(MaxPopulationSize);
         // 遗传终止方法
         configuration.setTerminatingCriterion(TerminatingCriterionProvider.refactorTerminatingCriterion(

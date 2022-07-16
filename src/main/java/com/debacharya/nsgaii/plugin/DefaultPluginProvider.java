@@ -115,7 +115,9 @@ public class DefaultPluginProvider {
 		str="";
 		for(int i=0;i<citynum;i++) {
 			if(visit[i]) continue;
-			no_hinge_map1.put(index++,i);
+//			System.out.println(i+" "+index);
+			no_hinge_map1.put(index,i);
+			no_hinge_map2.put(i,index++);
 			str+=String.valueOf(i)+"_";
 		}
 //            System.out.println(str);
@@ -141,48 +143,53 @@ public class DefaultPluginProvider {
 		return new String(hinge_city_code);
 	}
 	public static String Create_no_hinge_city_code(String hinge_city_code){
-		char[] no_hinge_city_code=new char[no_hinge_citynum];
-		Arrays.fill(no_hinge_city_code,'0');
+//        System.out.println(hinge_city_code);
+		String ans="";
 		//通过与该中枢的流量和距离的比值，来确定选择的概率，zx是距离的流量比值，zd是距离的比值
-		double[][] zx=new double[no_hinge_citynum][hinge_citynum];
-		double[][] zd=new double[no_hinge_citynum][hinge_citynum];
-		double[][] zx_zd=new double[no_hinge_citynum][hinge_citynum];
+		float[][] zx=new float[no_hinge_citynum][hinge_citynum];
+		float[][] zd=new float[no_hinge_citynum][hinge_citynum];
+		float[][] zx_zd=new float[no_hinge_citynum][hinge_citynum];
 		Random random=new Random();
 		for(int i=0;i<no_hinge_citynum;i++){
-			int i_sumdistance=0,i_sumtransport=0;
+			int i_sumdistance=0;
+			float i_sumtransport=0;
 			//计算zx_zd
 			for(int j=0;j<hinge_citynum;j++){
-				if(hinge_city_code.charAt(j)==0) continue;
-				i_sumdistance+=city_distance[i][j]+city_distance[j][i];
-				i_sumtransport+=city_transport[i][j]+city_transport[j][i];
+				if(hinge_city_code.charAt(j)=='0') continue;
+//                System.out.println(i+" "+j+" "+no_hinge_map1.get(i)+" "+hinge_map1.get(j));
+				i_sumdistance+=city_distance[no_hinge_map1.get(i)][hinge_map1.get(j)];
+				i_sumtransport+=city_transport[no_hinge_map1.get(i)][hinge_map1.get(j)]
+						+city_transport[hinge_map1.get(j)][no_hinge_map1.get(i)];
 			}
-			double sum=0;
-			int city_choose_num=0;//设置为中枢城市且编码为1的数量
+//            System.out.println(i_sumdistance+" "+i_sumtransport);
+			float sum=0;
+			int city_choose_num=0;
 			for(int j=0;j<hinge_citynum;j++){
-				if(hinge_city_code.charAt(j)==0) continue;
-				zx[i][j]=(city_distance[i][j]+city_distance[j][i])/i_sumdistance;
-				zd[i][j]=(city_transport[i][j]+city_transport[j][i])/i_sumtransport;
+				if(hinge_city_code.charAt(j)=='0') continue;
+//                System.out.println((city_transport[no_hinge_map1.get(i)][hinge_map1.get(j)]+city_transport[hinge_map1.get(j)][no_hinge_map1.get(i)])/i_sumtransport);
+				zx[i][j]=(city_transport[no_hinge_map1.get(i)][hinge_map1.get(j)]+city_transport[hinge_map1.get(j)][no_hinge_map1.get(i)])/i_sumtransport;
+//                System.out.println((float)city_distance[no_hinge_map1.get(i)][hinge_map1.get(j)]/i_sumdistance+"sadsad");
+				zd[i][j]=(float) (city_distance[no_hinge_map1.get(i)][hinge_map1.get(j)])/i_sumdistance;
 				zx_zd[i][j]=zx[i][j]/zd[i][j];
+//                System.out.println(zx_zd[i][j]);
 				sum+=zx_zd[i][j];
 				city_choose_num++;
 			}
-			//zx_zd归一化和制作中枢城市表
-			HashMap<Character,Integer> m=new HashMap<>();//根据城市名找下标
-			char[] city_choose=new char[city_choose_num];
+			//zx_zd归一化和制作被选择中枢城市表
 			double[] zx_zd_city=new double[city_choose_num];
+			HashMap<Integer,Integer> m=new HashMap<>();//被选择的枢纽城市的映射表
 			int index=0;
 			for(int j=0;j<hinge_citynum;j++){
-				if(hinge_city_code.charAt(j)==0) continue;
-				char c=hinge_city.charAt(j);
-				m.put(c,j);
-				city_choose[index]=c;
+				if(hinge_city_code.charAt(j)=='0') continue;
 				zx_zd[i][j]=zx_zd[i][j]/sum;
-				zx_zd_city[index++]=zx_zd[i][j];
+				zx_zd_city[index]=zx_zd[i][j];
+				m.put(index++,j);
+//                System.out.println(zx_zd[i][j]);
 			}
 			//根据权重选择中枢城市
 			double[] no_hinge_city_zx_zd_quanzhong=new double[city_choose_num+1];
 			for(int j=1;j<=city_choose_num;j++){
-				no_hinge_city_zx_zd_quanzhong[i]=no_hinge_city_zx_zd_quanzhong[j-1]+zx_zd_city[j-1];
+				no_hinge_city_zx_zd_quanzhong[j]=no_hinge_city_zx_zd_quanzhong[j-1]+zx_zd_city[j-1];
 			}
 			int left=1,right=city_choose_num;
 			double target=random.nextDouble();
@@ -191,10 +198,11 @@ public class DefaultPluginProvider {
 				if(no_hinge_city_zx_zd_quanzhong[mid]<target) left=mid+1;
 				else right=mid;
 			}
-			no_hinge_city_code[m.get(city_choose[left-1])]='1';
+			ans+=hinge_map1.get(m.get(left-1))+"_";
 		}
-		return new String(no_hinge_city_code);
+		return ans.substring(0,ans.length()-1);
 	}
+
 	public static PopulationProducer InitPopulationProducer() {
 		// 接口里的参数是没用到的
 		return (populationSize, chromosomeLength, geneticCodeProducer, fitnessCalculator) -> {
@@ -203,11 +211,14 @@ public class DefaultPluginProvider {
 			for (int i = 0; i < start_num; i++) {
 				String hinge_code=Create_hinge_city_code();
 				String no_hinge_code=Create_no_hinge_city_code(hinge_code);
-				historyRecord.put(hinge_code+no_hinge_code, true);//
+				while(historyRecord.contains(hinge_code+no_hinge_code)) {
+					hinge_code=Create_hinge_city_code();
+					no_hinge_code=Create_no_hinge_city_code(hinge_code);
+				}
+				historyRecord.add(hinge_code+no_hinge_code);
 				cityAlleles.add(new CityAllele(hinge_code,no_hinge_code));
 			}
 			Chromosome initIndividual = new Chromosome(new Chromosome(cityAlleles));
-
 			List<Chromosome> populace = new ArrayList<Chromosome>() {{ add(initIndividual); }};
 			return new Population(populace);
 		};
@@ -251,8 +262,8 @@ public class DefaultPluginProvider {
 				List<AbstractAllele> genelist=child.getGeneticCode();
 				CityAllele cityAllele=(CityAllele)genelist.get(0);
 				String[] codes=cityAllele.getGene();
-				if (!historyRecord.containsKey(child)) {
-					historyRecord.put(codes[0]+codes[1],true);
+				if (!historyRecord.contains(child)) {
+					historyRecord.add(codes[0]+codes[1]);
 					populace.add(child);
 				}
 			}

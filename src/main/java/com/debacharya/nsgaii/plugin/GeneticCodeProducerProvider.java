@@ -2,14 +2,20 @@ package com.debacharya.nsgaii.plugin;
 
 import com.debacharya.nsgaii.Service;
 import com.debacharya.nsgaii.datastructure.BooleanAllele;
+import com.debacharya.nsgaii.datastructure.CityAllele;
 import com.debacharya.nsgaii.datastructure.IntegerAllele;
 import com.debacharya.nsgaii.datastructure.ValueAllele;
+import com.debacharya.nsgaii.objectivefunction.min_fee;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import static com.debacharya.nsgaii.loadData.hinge_city;
+import static com.debacharya.nsgaii.plugin.DefaultPluginProvider.Create_hinge_city_code;
+import static com.debacharya.nsgaii.plugin.DefaultPluginProvider.Create_no_hinge_city_code;
 
 public class GeneticCodeProducerProvider {
 
@@ -25,61 +31,18 @@ public class GeneticCodeProducerProvider {
 		};
 	}
 
-	public static GeneticCodeProducer valueEncodedGeneticCodeProducer(double origin, double bound, boolean unique) {
+	public static GeneticCodeProducer valueEncodedGeneticCodeProducer() {
 		return length -> {
+			Create_no_hinge_city_code(Create_hinge_city_code());
+			String hinge_code=Create_hinge_city_code();
+			String no_hinge_code=Create_no_hinge_city_code(hinge_code);
+//			System.out.println(hinge_city);
+//			System.out.println(hinge_code);
+//			System.out.println(no_hinge_code);
+			List<CityAllele> cityAlleles = new ArrayList<>();
+			cityAlleles.add(new CityAllele(hinge_code,no_hinge_code));
 
-			int count = -1;
-			List<ValueAllele> geneticCode = new ArrayList<>();
-
-			while(count < (length - 1)) {
-
-				double value = ThreadLocalRandom.current().nextDouble(origin, (bound + 0.1));
-
-				if(value > bound)
-					value = bound;
-
-				value = Service.roundOff(value, 4);
-
-				if(unique && Service.isInGeneticCode(geneticCode, value))
-					continue;
-
-				geneticCode.add(
-					++count,
-					new ValueAllele(value)
-				);
-			}
-
-			return geneticCode;
-		};
-	}
-
-	public static GeneticCodeProducer permutationEncodingGeneticCodeProducer() {
-		return length -> {
-
-			List<ValueAllele> valueEncodedGeneticCode = GeneticCodeProducerProvider
-															.valueEncodedGeneticCodeProducer(0, 1, true)
-															.produce(length)
-															.stream()
-															.map(e -> (ValueAllele)e)
-															.collect(Collectors.toList());
-
-			List<ValueAllele> originalGeneticCode = new ArrayList<>(valueEncodedGeneticCode);
-			List<IntegerAllele> permutationEncodedGeneticCode = new ArrayList<>();
-
-			valueEncodedGeneticCode.sort(Comparator.comparingDouble(ValueAllele::getGene));
-
-			originalGeneticCode.forEach(e -> {
-				valueEncodedGeneticCode.forEach(v -> {
-					if(e.getGene().equals(v.getGene()))
-						permutationEncodedGeneticCode.add(
-							new IntegerAllele(
-								valueEncodedGeneticCode.indexOf(v) + 1
-							)
-						);
-				});
-			});
-
-			return permutationEncodedGeneticCode;
+			return cityAlleles;
 		};
 	}
 }

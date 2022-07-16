@@ -23,16 +23,22 @@ public class FatherCrossover extends AbstractCrossover{
         //取出p1,p2染色体的等位基因
         List<AbstractAllele> gene1=p1.getGeneticCode(),gene2=p2.getGeneticCode();
         CityAllele cityAllele1=(CityAllele)gene1.get(0),
-                   cityAllele2=(CityAllele)gene2.get(0);
+                cityAllele2=(CityAllele)gene2.get(0);
         String[] cityCodes1=cityAllele1.getGene(),
-                 cityCodes2=cityAllele2.getGene();
+                cityCodes2=cityAllele2.getGene();
         char[] hinge_city_code1=cityCodes1[0].toCharArray(),
-               hinge_city_code2=cityCodes2[0].toCharArray();
+                hinge_city_code2=cityCodes2[0].toCharArray();
+//        System.out.println("枢纽城市变异前");
+//        System.out.println(new String(hinge_city_code1));
+//        System.out.println(new String(hinge_city_code2));
         //交叉染色体，对于枢纽城市，则将他们加入并集，并按照p=crossoverProb的概率进行伯努利抽样,并且枢纽城市的数量保持n=hinge_citynum
-        Random random=new Random();
+        //交叉算法有两种，一种是对枢纽城市进行交叉算法，将两个染色体的是否被选择为枢纽城市进行交叉，如果是对枢纽城市进行交叉计算的话，那么非枢纽和枢纽机场之间的连接需要重新生成；
+        //另一种是非枢纽城市和枢纽的连接进行交叉，让两个染色体的同一个城市和连接的枢纽城市进行交叉
+        //这两种交叉只能两者取其一
         //交叉中枢城市编码,按伯努利分布进行抽样，满足设定概率值则两两交换
+        Random random=new Random();
         for(int i=0;i<hinge_citynum;i++){
-            double temp_p=random.nextDouble();
+            float temp_p=random.nextFloat();
             if(temp_p<=crossoverProb) {
                 char temp=hinge_city_code1[i];
                 hinge_city_code1[i]=hinge_city_code2[i];
@@ -40,22 +46,26 @@ public class FatherCrossover extends AbstractCrossover{
             }
         }
         //生成非中枢城市路径之间的连接
-        String son_no_hinge_city_code1= DefaultPluginProvider.Create_hinge_city_code(),
-                son_no_hinge_city_code2=DefaultPluginProvider.Create_hinge_city_code();
+        String son_no_hinge_city_code1= DefaultPluginProvider.Create_no_hinge_city_code(new String(hinge_city_code1)),
+                son_no_hinge_city_code2=DefaultPluginProvider.Create_no_hinge_city_code(new String(hinge_city_code1));
+//        System.out.println("枢纽城市变异后");
+//        System.out.println(new String(hinge_city_code1));
+//        System.out.println(new String(hinge_city_code2));
+//        System.out.println(son_no_hinge_city_code1);
+//        System.out.println(son_no_hinge_city_code2);
         List<CityAllele> geneticCodes1=new ArrayList<>(),geneticCodes2=new ArrayList<>();
         CityAllele gen1=new CityAllele(new String(hinge_city_code1),son_no_hinge_city_code1),
-                    gen2=new CityAllele(new String(hinge_city_code2),son_no_hinge_city_code2);
+                gen2=new CityAllele(new String(hinge_city_code2),son_no_hinge_city_code2);
         geneticCodes1.add(gen1);
         geneticCodes2.add(gen2);
         Chromosome c1=new Chromosome(geneticCodes1),
-                   c2=new Chromosome(geneticCodes2);
-        //
-        if (!historyRecord.containsKey(hinge_city_code1+son_no_hinge_city_code1)) {
-            historyRecord.put(hinge_city_code1+son_no_hinge_city_code1, true);
+                c2=new Chromosome(geneticCodes2);
+        if (!historyRecord.contains(new String(hinge_city_code1)+son_no_hinge_city_code1)) {
+            historyRecord.add(new String(hinge_city_code1)+son_no_hinge_city_code1);
             children.add(c1);
         }
-        if (!historyRecord.containsKey(hinge_city_code2+son_no_hinge_city_code2)) {
-            historyRecord.put(hinge_city_code2+son_no_hinge_city_code2, true);
+        if (!historyRecord.contains(new String(hinge_city_code2)+son_no_hinge_city_code2)) {
+            historyRecord.add(new String(hinge_city_code2)+son_no_hinge_city_code2);
             children.add(c2);
         }
     }

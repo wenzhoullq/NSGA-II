@@ -3,14 +3,13 @@ package com.debacharya.nsgaii.mutation;
 import com.debacharya.nsgaii.datastructure.AbstractAllele;
 import com.debacharya.nsgaii.datastructure.Chromosome;
 import com.debacharya.nsgaii.datastructure.CityAllele;
+import com.debacharya.nsgaii.plugin.DefaultPluginProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.debacharya.nsgaii.loadData.hinge_city;
-import static com.debacharya.nsgaii.loadData.hinge_citynum;
-import static com.debacharya.nsgaii.loadData.no_hinge_citynum;
+import static com.debacharya.nsgaii.loadData.*;
 
 public class SingleMutation extends AbstractMutation{
     public SingleMutation(float mutationProbability){
@@ -22,18 +21,23 @@ public class SingleMutation extends AbstractMutation{
         List<AbstractAllele> genelist=chromosome.getGeneticCode();
         CityAllele cityAllele=(CityAllele)genelist.get(0);
         String[] codes=cityAllele.getGene();
-        char[] hinge_city_code=codes[0].toCharArray(),
-               no_hinge_city_code=codes[1].toCharArray();
+        char[] hinge_city_code=codes[0].toCharArray();
+        String no_hinge_city_code=codes[1];
         Random random=new Random();
-        int no_hinge_city_mutation= random.nextInt(no_hinge_citynum);
-        int hinge_city_mutation=random.nextInt(hinge_citynum);
-        while(true){
-            if(hinge_city_code[hinge_city_mutation]==1) break;
-            hinge_city_mutation=random.nextInt(hinge_citynum);
+        for(int i=0;i<hinge_citynum;i++){
+            float temp_p=random.nextFloat();
+//            System.out.println(temp_p+" "+mutationProb);
+            if(temp_p<mutationProb){
+                if(hinge_city_code[i]=='1') hinge_city_code[i]='0';
+                else hinge_city_code[i]='1';
+            }
         }
-        no_hinge_city_code[no_hinge_city_mutation]=hinge_city.charAt(hinge_city_mutation);
         List<AbstractAllele> targetlist=new ArrayList<>();
-        CityAllele targetAllele=new CityAllele(new String(hinge_city_code),new String(no_hinge_city_code));
+        String after_hinge_city_code=new String(hinge_city_code);
+//        System.out.println(after_hinge_city_code);
+//        System.out.println(codes[0]);
+        if(!after_hinge_city_code.equals(codes[0])) no_hinge_city_code=DefaultPluginProvider.Create_no_hinge_city_code(new String(hinge_city_code));
+        CityAllele targetAllele=new CityAllele(after_hinge_city_code,no_hinge_city_code );
         targetlist.add(targetAllele);
         return new Chromosome(targetlist);
     }

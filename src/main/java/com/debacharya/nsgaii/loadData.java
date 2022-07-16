@@ -3,6 +3,7 @@ package com.debacharya.nsgaii;
 import com.debacharya.nsgaii.datastructure.Chromosome;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static com.debacharya.nsgaii.plugin.DefaultPluginProvider.Create_city;
 
@@ -19,6 +20,8 @@ public class loadData {
     public static float mutationProb;
     //交叉的概率
     public static float crossoverProb;
+    //选择非枢纽机场变化方式的概率
+    public static float choose_way;
     //种群初始化的数量
     public static int start_num;
     //城市之间的距离
@@ -38,9 +41,7 @@ public class loadData {
     //非枢纽城市的数量（第二条等位基因的长度）
     public static int no_hinge_citynum;
     //已产生的基因型记录
-    public static HashMap<String, Boolean> historyRecord;//String是:枢纽城市code+非枢纽城市code
-    //交叉时选择基因的概率
-    public static  float p= 0.5F;
+    public static HashSet<String> historyRecord=new HashSet<>();//String是:枢纽城市code+非枢纽城市code
     //选择为待用中枢机场概率表
     public static float[] zx_zd;
     // 中枢机场概率表——归一化处理————因为枢纽机场基因表确定下来，它的概率表也会确定下来
@@ -53,7 +54,7 @@ public class loadData {
     public static  HashMap<Integer,Integer> hinge_map2=new HashMap<>();
     //非中枢机场基因下标和非中枢机场的名称的映射，下标在前
     public static  HashMap<Integer,Integer> no_hinge_map1=new HashMap<>();
-    //非中枢机场基因下标和非中枢机场的名称的映射，下标在前
+    //非中枢机场基因下标和非中枢机场的名称的映射，下标在后
     public static  HashMap<Integer,Integer> no_hinge_map2=new HashMap<>();
     //飞机A单位飞机每公里的费用,用于支线—>中枢或者中枢——>支线
     public static int fee1;
@@ -73,6 +74,9 @@ public class loadData {
     public static int up_down1;
     //飞机B起飞降落的油耗
     public static int up_down2;
+
+    public static void setChoose_way(float choose_way) {   loadData.choose_way = choose_way;}
+
     public static void setExperimentTimes(int experimentTimes) {
         loadData.experimentTimes = experimentTimes;
     }
@@ -133,13 +137,6 @@ public class loadData {
         loadData.no_hinge_citynum = no_hinge_citynum;
     }
 
-    public static void setHistoryRecord(HashMap<String, Boolean> historyRecord) {
-        loadData.historyRecord = historyRecord;
-    }
-
-    public static void setP(float p) {
-        loadData.p = p;
-    }
 
     public static void setZx_zd(float[] zx_zd) {
         loadData.zx_zd = zx_zd;
@@ -189,6 +186,7 @@ public class loadData {
     public static void setUp_down2(int up_down2) {
         loadData.up_down2 = up_down2;
     }
+
     public static  void init(){
         int[][] city_distance={{0,1446,1697,1967,2493,1200,2266,981,1178,730,1133,2842,1774,1034,690},
                                {1446,0,940,620,1100,805,1116,799,964,2191,658,3261,873,955,828},
@@ -238,5 +236,39 @@ public class loadData {
         setHinge_city_zx_zd_quanzhong(hinge_citynum+1);
         //初始化编码
         Create_city();
+        //初始化枢纽机场之间的折扣
+        setDiscount(0.8f);
+        //初始化非枢纽机场-枢纽机场单价飞机的运输量
+        setAirplane1(200);
+        //初始化非枢纽机场-枢纽机场的运输费用
+        setFee1(100);
+        //初始化枢纽机场-枢纽机场单价飞机的运输量
+        setAirplane2(500);
+        //初始化枢纽机场-枢纽机场的运输费用
+        setFee2(80);
+        //初始化非枢纽机场-枢纽机场的CO2的排放
+        setCo2_1(100);
+        //初始化枢纽机场-枢纽机场的CO2的排放
+        setCo2_2(80);
+        //初始化枢纽机场-非枢纽机场之间运输飞机的起飞降落co2消耗值
+        setUp_down1(10);
+        //初始化枢纽机场-枢纽机场之间运输飞机的起飞降落co2消耗值
+        setUp_down2(8);
+        //初始化基因交叉的概率
+        setCrossoverProb(0.5f);
+        //初始化基因变异的概率
+        setMutationProb(0.2f);
+        //初始化选择非枢纽机场变化的概率
+        setChoose_way(0.1f);
+        //设置代数
+        setMaxGeneration(50);
+        //设置一个种群的最大个体数
+        setMaxRecord(1000);
+        //设置最大种群数
+        setMaxPopulationSize(500);
+        //设置初始个数
+        setStart_num(2);
+        //设置实验次数
+        setExperimentTimes(50);
     }
 }
